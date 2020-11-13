@@ -1,8 +1,10 @@
 package Game;
 import java.io.*;
 import java.util.*;
+import java.net.URL;
 public class Main {
     public static void main(String[] args) throws IOException {
+        ClearScreen();
         int input =-1;
         Scanner inputCommand = new Scanner(System.in);
         while(input <0) {
@@ -76,6 +78,7 @@ public class Main {
     {
         String textLine, account, password, filePath= "Account Database.txt";
         int count =0;
+        int index =0;
         String[] accountInfo;
         ArrayList<String> accountList = new ArrayList<String>();
         ArrayList<String> passwordList = new ArrayList<String>();
@@ -109,6 +112,7 @@ public class Main {
             if (account.equals(i))
             {
                 count++;
+                index = accountList.indexOf(i);
                 break;
             }
         }
@@ -120,17 +124,20 @@ public class Main {
 
         System.out.println("Enter your password: " );
         password = scanner.nextLine();
-        for (String i : passwordList)
+        if (password.equals(passwordList.get(index)))
         {
-            if (password.equals(i))
-            {
-                System.out.println("Logged in successfully!");
-                main(null);
-            }
+            System.out.println("Logged in successfully!");
+            main(null);
         }
+
 
         System.out.println("Invalid password.");
         main(null);
+    }
+
+    public static void ClearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
 }
