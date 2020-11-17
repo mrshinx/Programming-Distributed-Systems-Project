@@ -1,9 +1,14 @@
 package Game;
 import java.io.*;
 import java.util.*;
-import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 public class Main {
-    public static void main(String[] args) throws IOException {
+    @SuppressWarnings("resource")
+	public static void main(String[] args) throws IOException {
         ClearScreen();
         int input =-1;
         Scanner inputCommand = new Scanner(System.in);
@@ -33,7 +38,6 @@ public class Main {
             default:
 
         }
-
 
 
     }
@@ -76,7 +80,8 @@ public class Main {
 
     public static void Login() throws IOException
     {
-        String textLine, account, password, filePath= "Account Database.txt";
+        String textLine, account, password , filePath= "Account Database.txt";
+  
         int count =0;
         int index =0;
         String[] accountInfo;
@@ -123,16 +128,60 @@ public class Main {
         }
 
         System.out.println("Enter your password: " );
-        password = scanner.nextLine();
+    
+       password= scanner.nextLine();
+        
         if (password.equals(passwordList.get(index)))
         {
             System.out.println("Logged in successfully!");
-            main(null);
+            nextstep(password);
         }
 
 
         System.out.println("Invalid password.");
         main(null);
+    }
+    
+    public static void nextstep(String password) throws IOException
+    {
+    String choice,old,newpass;
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Press 1 to play and 2 to change your password");
+    choice = sc.nextLine();
+    switch(choice)
+    {
+        case "1":
+            System.out.println("In progress......");
+            break;
+        case "2":
+            System.out.println("Enter your old password");
+            old = sc.nextLine();
+            if (old.contentEquals(password))
+            {
+            	System.out.println("Enter your new password");
+            	newpass = sc.nextLine();
+            	Path path = Paths.get("Account Database.txt");
+            	Charset charset = StandardCharsets.UTF_8;
+
+            	String content = new String(Files.readAllBytes(path), charset);
+            	content = content.replaceAll(old, newpass);
+            	Files.write(path, content.getBytes(charset));
+            	System.out.println("Successfully changed");
+            	nextstep(password);
+            }
+            
+            
+            
+            else {
+            	System.out.println("The password you entered was incorrect");
+            	nextstep(password);
+                 }
+            break;
+        default: 
+        	System.out.println("Enter a valid number");
+        	nextstep(password);
+    }
+    main(null);
     }
 
     public static void ClearScreen() {
@@ -141,4 +190,5 @@ public class Main {
     }
 
 }
+
 
