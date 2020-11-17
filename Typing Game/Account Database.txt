@@ -1,5 +1,1 @@
-mrshinx binmap123
-mrshinx2 binmap321
-mrshinx3 binmap456
-mrshinxabc binmap12345
-mrshinx123  mrshinx
+
