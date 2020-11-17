@@ -1,18 +1,14 @@
 package Game;
 import java.io.*;
 import java.util.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 public class Main {
     @SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException {
         ClearScreen();
         int input =-1;
         Scanner inputCommand = new Scanner(System.in);
-        while(input <0) {
+        while(input <0) 
+        {
             try {
                 System.out.println("Press 1 to register, press 2 to login: ");
                 input = inputCommand.nextInt();
@@ -80,7 +76,7 @@ public class Main {
 
     public static void Login() throws IOException
     {
-        String textLine, account, password , filePath= "Account Database.txt";
+        String textLine, account, password , choice ,newpass ,  filePath= "Account Database.txt";
   
         int count =0;
         int index =0;
@@ -134,31 +130,85 @@ public class Main {
         if (password.equals(passwordList.get(index)))
         {
             System.out.println("Logged in successfully!");
-            nextstep(password);
+            System.out.println("Press 1 to play and 2 to change your password");
+            choice = scanner.nextLine();
+            switch(choice)
+            {
+                case "1":
+                    System.out.println("In progress...");
+                    play();
+                    break;
+                case "2":
+                    System.out.println("Enter your new password");
+                    newpass= scanner.nextLine();
+                    String oldContent = "" ;
+                    File fileToBeModified = new File(filePath); 
+                    BufferedReader reader = null;
+                    FileWriter writer = null;   
+                    try
+                    {
+                        reader = new BufferedReader(new FileReader(fileToBeModified));
+                         
+                        //Reading all the lines of input text file into oldContent
+                         
+                        String line = reader.readLine();
+                         
+                        while (line != null) 
+                        {
+                            oldContent = oldContent + line + System.lineSeparator();
+                             
+                            line = reader.readLine();
+                        }
+                         
+                        //Replacing oldString with newString in the oldContent
+                         
+                        String newContent = oldContent.replaceAll(password, newpass);
+                         
+                        //Rewriting the input text file with newContent
+                         
+                        writer = new FileWriter(fileToBeModified);
+                         
+                        writer.write(newContent);
+                        System.out.println("Password successfully changed");
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            //Closing the resources
+                             
+                            reader.close();
+                             
+                            writer.close();
+                        } 
+                        catch (IOException e) 
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                break;
+                 
+                default:
+                	System.out.println("Invalid input");
+                	Login();
+            }
+
+            	
+           
         }
 
-
+        else {
         System.out.println("Invalid password.");
+        }
         main(null);
     }
     
-    public static void nextstep(String password) throws IOException
-    {
-    String choice,old,newpass;
-    Scanner sc = new Scanner(System.in);
-    System.out.println("Press 1 to play and 2 to change your password");
-    choice = sc.nextLine();
-    switch(choice)
-    {
-        case "1":
-            System.out.println("In progress......");
-            break;
-        case "2":
-            System.out.println("Enter your old password");
-            old = sc.nextLine();
-            if (old.contentEquals(password))
-            {
-            	System.out.println("Enter your new password");
+  
+            /*	System.out.println("Enter your new password");
             	newpass = sc.nextLine();
             	Path path = Paths.get("Account Database.txt");
             	Charset charset = StandardCharsets.UTF_8;
@@ -166,23 +216,12 @@ public class Main {
             	String content = new String(Files.readAllBytes(path), charset);
             	content = content.replaceAll(old, newpass);
             	Files.write(path, content.getBytes(charset));
-            	System.out.println("Successfully changed");
-            	nextstep(password);
-            }
-            
-            
-            
-            else {
-            	System.out.println("The password you entered was incorrect");
-            	nextstep(password);
-                 }
-            break;
-        default: 
-        	System.out.println("Enter a valid number");
-        	nextstep(password);
-    }
-    main(null);
-    }
+            	System.out.println("Successfully changed"); */
+public static void play() throws IOException
+{ System.out.println("In progress..");
+ main(null);
+}
+    
 
     public static void ClearScreen() {
         System.out.print("\033[H\033[2J");
@@ -190,5 +229,7 @@ public class Main {
     }
 
 }
+
+
 
 
