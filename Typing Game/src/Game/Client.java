@@ -81,7 +81,7 @@ public class Client {
 
     public static void Register() throws IOException
     {
-        String account="", password="";
+        String account="", password="", serverMessage;
         Scanner sc = new Scanner(System.in);
 
         while(account.equals(""))
@@ -90,6 +90,13 @@ public class Client {
             account = sc.nextLine();
             outputStr.writeUTF(account);
             outputStr.flush();
+            serverMessage = inputStr.readUTF();
+            //Check if server send ok response (account valid or not)
+            if(!serverMessage.equals("ok"))
+            {
+                System.out.println(serverMessage);
+                account = "";
+            }
 
         }
         while(password.equals(""))

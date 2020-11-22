@@ -44,7 +44,7 @@ public class Server {
 
     public static void Register() throws IOException
     {
-        String account, password, filePath = "Account Database.txt";
+        String account="", password="", filePath = "Account Database.txt";
 
         BufferedWriter bw = null;
         try
@@ -57,11 +57,18 @@ public class Server {
             main(null);
         }
         // Read account input from client
-        System.out.println("Listening for account");
-        account = inputStr.readUTF();
-        if(account.length() >0)
-        {
-            bw.write(account);
+        while (account.equals("")) {
+            System.out.println("Listening for account");
+            account = inputStr.readUTF();
+            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account))) {
+                outputStr.writeUTF("ok");
+                bw.write(account);
+            } else {
+                System.out.println();
+                outputStr.writeUTF("Account name already exists, try another one");
+                outputStr.flush();
+                account = "";
+            }
         }
         // Read password input from client
         System.out.println("Listening for password");
@@ -138,7 +145,49 @@ public class Server {
         main(null);
     }
 
+    public static Boolean CheckForDuplicate(String filePath, String accountname) throws IOException{
 
+        ArrayList<String> accountList = new ArrayList<String>();
+        ArrayList<String> passwordList = new ArrayList<String>();
+        GetUsernameAndPassword(filePath, accountList, passwordList);
+
+        if(accountList.contains(accountname)){
+            return  true;
+        }
+
+        else{
+            return  false;
+        }
+    }
+
+    public static void GetUsernameAndPassword(String filePath, ArrayList<String> accountList,
+                                              ArrayList<String> passwordList) throws IOException{
+
+        String[] accountInfo;
+
+        BufferedReader br = null;
+        String textLine;
+        try
+        {
+            br = new BufferedReader(new FileReader(filePath));
+        }
+        catch(Exception e)
+        {
+            System.out.println("Cannot open file, program terminated");
+            main(null);
+        }
+
+        textLine = br.readLine();
+        while(textLine!=null)
+        {
+            accountInfo = textLine.split(" ");
+            accountList.add(accountInfo[0]);
+            passwordList.add(accountInfo[1]);
+
+            textLine = br.readLine();
+        }
+        br.close();
+    }
 
 }
 
