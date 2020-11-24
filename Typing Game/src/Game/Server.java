@@ -56,16 +56,22 @@ public class Server {
             System.out.println("Cannot create file");
             main(null);
         }
-        // Read account input from client
-        while (account.equals("")) {
+
+        while (account.equals(""))
+        {
+            // Read account input from client
             System.out.println("Listening for account");
             account = inputStr.readUTF();
-            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account))) {
+            //Check if account is valid
+            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account)))
+            {
                 outputStr.writeUTF("ok");
                 bw.write(account);
-            } else {
+            }
+            else
+            {
                 System.out.println();
-                outputStr.writeUTF("Account name already exists, try another one");
+                outputStr.writeUTF("Invalid account, try another one");
                 outputStr.flush();
                 account = "";
             }
@@ -81,6 +87,7 @@ public class Server {
         }
 
         bw.close();
+        //Reset input and call ServerBehavior method to start all over again
         input = "";
         ServerBehavior();
     }
