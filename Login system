@@ -1,0 +1,38 @@
+package Game;
+
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String account;
+        String Password;
+
+        Password = "smth";
+        account = "smb";
+
+        Scanner input1 = new Scanner(System.in);
+        System.out.println("Enter your Account : ");
+        account = input1.next();
+
+        Scanner input2 = new Scanner(System.in);
+        System.out.println("Enter your Password : ");
+        String password = input2.next();
+
+        if (account.equals(account) && password.equals(Password)) {
+
+            System.out.println("Logged in successfully! Welcome!");
+        }
+
+        else if (account.equals(account)) {
+            System.out.println("Invalid Password!");
+        } else if (password.equals(Password)) {
+            System.out.println("Invalid Account!");
+        } else {
+            System.out.println("Invalid Account & Password!");
+        }
+
+    }
+
+}
