@@ -142,6 +142,7 @@ public class Client {
             if(serverMessage.equals("ok"))
             {
                 System.out.println("Logged in successfully");
+                Interface();
             }
             else
             {
