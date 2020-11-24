@@ -111,41 +111,45 @@ public class Client {
 
     public static void Login() throws IOException
     {
-        String account, password;
-        int count =0;
-        int index =0;
-        String[] accountInfo;
-        ArrayList<String> accountList = new ArrayList<String>();
-        ArrayList<String> passwordList = new ArrayList<String>();
-        Scanner scanner = new Scanner(System.in);
+        String account="", password="", serverMessage;
+        Scanner sc = new Scanner(System.in);
 
-        System.out.println("Enter your account: " );
-        account = scanner.nextLine();
-        for (String i : accountList)
+        while(account.equals(""))
         {
-            if (account.equals(i))
+            System.out.println("Please enter account: ");
+            account = sc.nextLine();
+            //Send account to server
+            outputStr.writeUTF(account);
+            outputStr.flush();
+            //Check if server send ok response (account valid or not)
+            serverMessage = inputStr.readUTF();
+            if(!serverMessage.equals("ok"))
             {
-                count++;
-                index = accountList.indexOf(i);
-                break;
+                System.out.println(serverMessage);
+                account = "";
             }
         }
-        if (count ==0)
+
+        while(password.equals(""))
         {
-            System.out.println("Invalid account" );
-            main(null);
+            System.out.println("Please enter password: ");
+            password = sc.nextLine();
+            //Send password to server
+            outputStr.writeUTF(password);
+            outputStr.flush();
+            //Check if server send ok response (password valid or not)
+            serverMessage = inputStr.readUTF();
+            if(serverMessage.equals("ok"))
+            {
+                System.out.println("Logged in successfully");
+            }
+            else
+            {
+                System.out.println(serverMessage);
+                password = "";
+            }
         }
 
-        System.out.println("Enter your password: " );
-        password = scanner.nextLine();
-        if (password.equals(passwordList.get(index)))
-        {
-            System.out.println("Logged in successfully!");
-            main(null);
-        }
-
-        System.out.println("Invalid password.");
-        main(null);
     }
 
 }
