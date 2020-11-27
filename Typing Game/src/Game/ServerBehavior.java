@@ -83,6 +83,7 @@ public class ServerBehavior implements Runnable{
             if ((account.length() > 0) && (!CheckForDuplicate(filePath, account)))
             {
                 outputStr.writeUTF("ok");
+                outputStr.flush();
                 bw.write(account);
             }
             else
