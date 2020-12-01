@@ -80,7 +80,7 @@ public class ServerBehavior implements Runnable{
 
             account = inputStr.readUTF();
             //Check if account is valid
-            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account))&&(!account.equals(" ")))
+            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account)))
             {
                 outputStr.writeUTF("ok");
                 bw.write(account);
@@ -140,18 +140,22 @@ public class ServerBehavior implements Runnable{
 
         System.out.println("Enter your account: " );
         account = scanner.nextLine();
+        account = inputStr.readUTF();
         for (String i : accountList)
         {
             if (account.equals(i))
             {
                 count++;
                 index = accountList.indexOf(i);
+                outputStr.writeUTF("ok");
                 break;
             }
         }
         if (count ==0)
         {
             System.out.println("Invalid account" );
+            outputStr.writeUTF("Invalid account, try another one");
+            outputStr.flush();
         }
 
         System.out.println("Enter your password: " );
@@ -159,9 +163,13 @@ public class ServerBehavior implements Runnable{
         if (password.equals(passwordList.get(index)))
         {
             System.out.println("Logged in successfully!");
+            outputStr.writeUTF("ok");
         }
-
+        else {
         System.out.println("Invalid password.");
+        outputStr.writeUTF("Invalid password");
+        outputStr.flush();
+        }
     }
 
     public Boolean CheckForDuplicate(String filePath, String accountname) throws IOException{
@@ -170,7 +178,8 @@ public class ServerBehavior implements Runnable{
         ArrayList<String> passwordList = new ArrayList<String>();
         GetUsernameAndPassword(filePath, accountList, passwordList);
 
-        if(accountList.contains(accountname)){
+        if(accountList.contains(accountname))
+        {
             return  true;
         }
 
@@ -205,5 +214,7 @@ public class ServerBehavior implements Runnable{
         }
         br.close();
     }
+
+
 
 }
