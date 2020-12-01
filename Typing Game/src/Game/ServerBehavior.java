@@ -80,7 +80,7 @@ public class ServerBehavior implements Runnable{
 
             account = inputStr.readUTF();
             //Check if account is valid
-            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account)))
+            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account))&&(!account.equals(" ")))
             {
                 outputStr.writeUTF("ok");
                 bw.write(account);
