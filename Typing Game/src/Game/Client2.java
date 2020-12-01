@@ -147,6 +147,7 @@ public class Client2 {
                 password = "";
             }
         }
+        Interface();
 
     }
 
