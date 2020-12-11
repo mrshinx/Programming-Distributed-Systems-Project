@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class ServerBehavior implements Runnable{
@@ -80,10 +81,9 @@ public class ServerBehavior implements Runnable{
 
             account = inputStr.readUTF();
             //Check if account is valid
-            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account)))
+            if ((account.length() > 0) && (!CheckForDuplicate(filePath, account))&&(!account.equals(" ")))
             {
                 outputStr.writeUTF("ok");
-                outputStr.flush();
                 bw.write(account);
             }
             else
@@ -111,58 +111,50 @@ public class ServerBehavior implements Runnable{
 
     public void Login() throws IOException
     {
-        String textLine, account, password, filePath= "Account Database.txt";
+        String account="", password="", filePath= "Account Database.txt";
         int count =0;
         int index =0;
         String[] accountInfo;
         ArrayList<String> accountList = new ArrayList<String>();
         ArrayList<String> passwordList = new ArrayList<String>();
-        Scanner scanner = new Scanner(System.in);
+        GetUsernameAndPassword(filePath, accountList, passwordList);
 
-        BufferedReader br = null;
-        try
+        while (account.equals(""))
         {
-            br = new BufferedReader(new FileReader(filePath));
-        }
-        catch(Exception e)
-        {
-            System.out.println("Cannot open file, program terminated");
-        }
-
-        textLine = br.readLine();
-        while(textLine!=null)
-        {
-            accountInfo = textLine.split(" ");
-            accountList.add(accountInfo[0]);
-            passwordList.add(accountInfo[1]);
-            textLine = br.readLine();
-        }
-        br.close();
-
-        System.out.println("Enter your account: " );
-        account = scanner.nextLine();
-        for (String i : accountList)
-        {
-            if (account.equals(i))
+            account = inputStr.readUTF();
+            for (String i : accountList)
             {
-                count++;
-                index = accountList.indexOf(i);
-                break;
+                if (account.equals(i)) {
+                    count++;
+                    index = accountList.indexOf(i);
+                    outputStr.writeUTF("ok");
+                    outputStr.flush();
+                    break;
+                }
+            }
+            if (count == 0)
+            {
+                outputStr.writeUTF("Invalid account, try another one");
+                outputStr.flush();
+                account="";
             }
         }
-        if (count ==0)
-        {
-            System.out.println("Invalid account" );
-        }
 
-        System.out.println("Enter your password: " );
-        password = scanner.nextLine();
-        if (password.equals(passwordList.get(index)))
+        while (password.equals(""))
         {
-            System.out.println("Logged in successfully!");
+            password = inputStr.readUTF();
+            if (password.equals(passwordList.get(index)))
+            {
+                System.out.println("Logged in successfully!");
+                outputStr.writeUTF("ok");
+                outputStr.flush();
+            }
+            else {
+                outputStr.writeUTF("Invalid password");
+                outputStr.flush();
+                password="";
+            }
         }
-
-        System.out.println("Invalid password.");
     }
 
     public Boolean CheckForDuplicate(String filePath, String accountname) throws IOException{
@@ -171,7 +163,8 @@ public class ServerBehavior implements Runnable{
         ArrayList<String> passwordList = new ArrayList<String>();
         GetUsernameAndPassword(filePath, accountList, passwordList);
 
-        if(accountList.contains(accountname)){
+        if(accountList.contains(accountname))
+        {
             return  true;
         }
 
@@ -206,5 +199,34 @@ public class ServerBehavior implements Runnable{
         }
         br.close();
     }
+    public void textgen()
+    {
+    	String characters = "QWERTYUIOPASDFGHJKLZXCVBNM";
+        String text = "";
+        Random rand = new Random();
+       while(text.length()<80) 
+           {
+       	int length = rand.nextInt(8);
+       	char[] word = new char[length];
+       	if (length==0)
+       		continue;
+            for(int i=0; i<length ;i++)
+             {
+            
+             word[i]=characters.charAt(rand.nextInt(characters.length()));
+        
+             }
+             for(int i=0; i < word.length;i++)
+             {
+             text += word[i];
+            
+             }
+           text += " ";
+        
+           }
+       System.out.println(text);
+    }
+
+
 
 }
