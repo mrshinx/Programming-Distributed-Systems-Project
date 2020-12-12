@@ -13,6 +13,7 @@ public class ServerBehavior implements Runnable{
     public DataOutputStream outputStr;
     public String input ="";
     public Socket connection;  // Create Socket
+    public Boolean stop = false;
 
     public ServerBehavior(Socket s)
     {
@@ -21,17 +22,20 @@ public class ServerBehavior implements Runnable{
 
     @Override
     public void run() {
-        try
+        while(!stop)
         {
+            try
+            {
 
-            inputStr = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
-            outputStr = new DataOutputStream(connection.getOutputStream());
+                inputStr = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
+                outputStr = new DataOutputStream(connection.getOutputStream());
 
-            Behavior();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+                Behavior();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -54,7 +58,11 @@ public class ServerBehavior implements Runnable{
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                input = " ";
+                stop = true;
+                ServerThreadManager.activeConnections.remove(connection);
+                System.out.println(connection+ " disconnected");
+                this.run();
             }
 
         }
@@ -199,6 +207,32 @@ public class ServerBehavior implements Runnable{
         br.close();
     }
 
+    public void textgen()
+    {
+        String characters = "QWERTYUIOPASDFGHJKLZXCVBNM";
+        String text = "";
+        Random rand = new Random();
+        while(text.length()<80)
+        {
+            int length = rand.nextInt(8);
+            char[] word = new char[length];
+            if (length==0)
+                continue;
+            for(int i=0; i<length ;i++)
+            {
 
+                word[i]=characters.charAt(rand.nextInt(characters.length()));
+
+            }
+            for(int i=0; i < word.length;i++)
+            {
+                text += word[i];
+
+            }
+            text += " ";
+
+        }
+        System.out.println(text);
+    }
 
 }
