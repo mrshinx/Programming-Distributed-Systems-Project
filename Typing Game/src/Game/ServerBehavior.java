@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
+import  java.util.Random;
 
 public class ServerBehavior implements Runnable{
 
@@ -129,21 +130,30 @@ public class ServerBehavior implements Runnable{
         while (account.equals(""))
         {
             account = inputStr.readUTF();
-            for (String i : accountList)
-            {
-                if (account.equals(i)) {
-                    count++;
-                    index = accountList.indexOf(i);
-                    outputStr.writeUTF("ok");
-                    outputStr.flush();
-                    break;
-                }
-            }
-            if (count == 0)
-            {
-                outputStr.writeUTF("Invalid account, try another one");
+
+            if(ServerThreadManager.OnlineAccounts.containsValue(account)){
+                outputStr.writeUTF(account + " has already logged in");
                 outputStr.flush();
                 account="";
+            }
+
+            else{
+                for (String i : accountList)
+                {
+                    if (account.equals(i)) {
+                        count++;
+                        index = accountList.indexOf(i);
+                        outputStr.writeUTF("ok");
+                        outputStr.flush();
+                        break;
+                    }
+                }
+                if (count == 0)
+                {
+                    outputStr.writeUTF("Invalid account, try another one");
+                    outputStr.flush();
+                    account="";
+                }
             }
         }
 
@@ -153,6 +163,8 @@ public class ServerBehavior implements Runnable{
             if (password.equals(passwordList.get(index)))
             {
                 System.out.println("Logged in successfully!");
+                ServerThreadManager.OnlineAccounts.put(Thread.currentThread().getName(), account);
+                System.out.println("Online Players : " + ServerThreadManager.OnlineAccounts);
                 outputStr.writeUTF("ok");
                 outputStr.flush();
             }

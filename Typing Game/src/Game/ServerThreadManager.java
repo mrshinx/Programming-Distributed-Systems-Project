@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,8 +12,9 @@ import java.util.concurrent.Executors;
 public class ServerThreadManager {
 
     private static Socket connection;  // Create Socket
-    private static ArrayList<Socket> activeConnections = new ArrayList<Socket>(); // Create list of active connections
+    public static ArrayList<Socket> activeConnections = new ArrayList<Socket>(); // Create list of active connections
     private static ServerSocket serverSocket;   // Create a Server Socket
+    public static HashMap<String, String> OnlineAccounts = new HashMap<String, String>(); // Contains thread names and corresponding account names
 
     public static void main(String[] args) throws IOException
     {
