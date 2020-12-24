@@ -223,6 +223,7 @@ public class ServerBehavior implements Runnable{
     {
         String characters = "QWERTYUIOPASDFGHJKLZXCVBNM";
         String text = "";
+        String block;
         Random rand = new Random();
         while(text.length()<80)
         {
@@ -242,9 +243,9 @@ public class ServerBehavior implements Runnable{
 
             }
             text += " ";
-
         }
-        System.out.println(text);
+        block = text.substring(0, text.length() -1);
+        System.out.println(block);
     }
 
 }
