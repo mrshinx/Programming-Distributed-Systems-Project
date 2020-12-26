@@ -1,5 +1,7 @@
 package Game;
 
+import com.sun.security.ntlm.Server;
+
 import java.io.*;
 
 import java.net.ServerSocket;
@@ -7,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 import  java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 public class ServerBehavior implements Runnable{
 
@@ -15,11 +18,21 @@ public class ServerBehavior implements Runnable{
     public String input ="";
     public Socket connection;  // Create Socket
     public Boolean stop = false;
-
+    public Boolean play = false;
+    public Boolean turn = false;
+    public Integer team;
+    public Integer order;
+    public BlockingQueue queue;
     public ServerBehavior(Socket s)
     {
         this.connection = s;
     }
+    public Match match;
+    public ServerBehavior matchedplayer;
+    public Integer score =3;
+    public Integer result = 0;
+    public Integer record = 2;
+    public String account;
 
     @Override
     public void run() {
@@ -38,6 +51,7 @@ public class ServerBehavior implements Runnable{
                 e.printStackTrace();
             }
         }
+
     }
 
     public void Behavior() throws IOException {
@@ -54,6 +68,21 @@ public class ServerBehavior implements Runnable{
                         Login();
                         break;
                     default:
+                        ServerThreadManager.ReadyAccounts.put(this, input);
+                        System.out.println("Ready Players: " + ServerThreadManager.ReadyAccounts);
+                        // Waiting for boolean "play" to turns true to start executing Play() method
+                        while(!play)
+                        {
+                            try {Thread.sleep(100);} catch (InterruptedException e) { e.printStackTrace();}
+                            continue;
+                        }
+
+                        while (play)
+                        {
+                            Play();
+                            play = false;
+                        }
+                        break;
 
                 }
             }
@@ -163,10 +192,13 @@ public class ServerBehavior implements Runnable{
             if (password.equals(passwordList.get(index)))
             {
                 System.out.println("Logged in successfully!");
-                ServerThreadManager.OnlineAccounts.put(Thread.currentThread().getName(), account);
+                ServerThreadManager.OnlineAccounts.put(this, account);
                 System.out.println("Online Players : " + ServerThreadManager.OnlineAccounts);
                 outputStr.writeUTF("ok");
                 outputStr.flush();
+                input="";
+                this.account = account;
+                Behavior();
             }
             else {
                 outputStr.writeUTF("Invalid password");
@@ -219,10 +251,11 @@ public class ServerBehavior implements Runnable{
         br.close();
     }
 
-    public void textgen()
+    public String Textgen()
     {
         String characters = "QWERTYUIOPASDFGHJKLZXCVBNM";
         String text = "";
+        String block;
         Random rand = new Random();
         while(text.length()<80)
         {
@@ -242,9 +275,195 @@ public class ServerBehavior implements Runnable{
 
             }
             text += " ";
-
         }
-        System.out.println(text);
+        block = text.substring(0, text.length() -1);
+        return block;
+    }
+
+    void Play()
+    {
+        if (order ==1)
+        {
+            try
+            {
+                DetermineMatchedPlayer();
+                outputStr.writeUTF("You are on team " + team);
+                outputStr.flush();
+                outputStr.writeUTF("You are the first player on your team");
+                outputStr.flush();
+                CountdownAndStart();
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+        else
+        {
+            try
+            {
+                DetermineMatchedPlayer();
+                outputStr.writeUTF("You are on team " + team);
+                outputStr.flush();
+                outputStr.writeUTF("You are the second player on your team. Wait until your turn.");
+                outputStr.flush();
+                while(!turn)
+                {
+                    Thread.sleep(200);
+                    continue;
+                }
+                CountdownAndStart();
+            }
+
+            catch (IOException e) { e.printStackTrace(); } catch (InterruptedException e) { e.printStackTrace(); }
+        }
+
+    }
+
+    void DetermineMatchedPlayer() {
+        try {
+            if (team == 1)
+            {
+                for (ServerBehavior Player : match.Team1)
+                {
+                    if (Player != this)
+                    {
+                        matchedplayer = Player;
+                        outputStr.writeUTF("You are matched with " + ServerThreadManager.OnlineAccounts.get(Player));
+                        outputStr.flush();
+                    }
+                }
+            }
+            else {
+                for (ServerBehavior Player : match.Team2)
+                {
+                    if (Player != this)
+                    {
+                        matchedplayer = Player;
+                        outputStr.writeUTF("You are matched with " + ServerThreadManager.OnlineAccounts.get(Player));
+                        outputStr.flush();
+                    }
+                }
+            }
+        }
+        catch (IOException e) { e.printStackTrace(); }
+    }
+
+    void CountdownAndStart()
+    {
+        Integer countdown = 5;
+        String playerInput;
+        String text = Textgen();
+        System.out.println(text.length());
+
+        try{
+            outputStr.writeUTF("Game starts after:");
+            outputStr.flush();
+            while (countdown > 0)
+            {
+                outputStr.writeUTF(countdown.toString());
+                outputStr.flush();
+                Thread.sleep(1000);
+                countdown--;
+            }
+
+            outputStr.writeUTF("Start");
+            outputStr.flush();
+
+            outputStr.writeUTF(text); // Send random text to player
+            outputStr.flush();
+            double start = System.currentTimeMillis(); // start timer
+
+            playerInput = inputStr.readUTF(); // ready player input
+            double end = System.currentTimeMillis(); // end timer
+            double elapsedTime = end - start; // calculate elapsed time
+
+            if(order ==1)
+            {
+                matchedplayer.turn =true;
+            }
+
+            if (playerInput.equals(text))
+            {
+                outputStr.writeUTF("Correct");
+                outputStr.flush();
+                outputStr.writeUTF("Time: " +elapsedTime/1000 + " seconds");
+                outputStr.flush();
+                score = 1; //Get score if correct
+                queue.put(this.account+ " "+ score +" " + elapsedTime/1000 ); // give Match the result
+            }
+            else
+            {
+                outputStr.writeUTF("Wrong");
+                outputStr.flush();
+                outputStr.writeUTF("Time: " +elapsedTime/1000 + " seconds");
+                outputStr.flush();
+                score = 0; //Get score if wrong
+                queue.put(this.account+ " "+ score +" " + elapsedTime/1000);
+            }
+
+            // Wait for the second player score to update if this is the 1st player:
+            while (matchedplayer.score==3)
+            {
+                Thread.sleep(100);
+                continue;
+            }
+
+            outputStr.writeUTF("Your team score is: " + (this.score + matchedplayer.score));
+            outputStr.flush();
+
+            // Wait for result win or lose:
+            while (result==0)
+            {
+                Thread.sleep(100);
+                continue;
+            }
+            if (result == 1)
+            {
+                outputStr.writeUTF("Your team has won");
+                outputStr.flush();
+            }
+            else
+            {
+                outputStr.writeUTF("Your team has lost");
+                outputStr.flush();
+            }
+
+            while(record==2)
+            {
+                Thread.sleep(100);
+                continue;
+            }
+            if (record == 1)
+            {
+                outputStr.writeUTF("You have made a new record");
+                outputStr.flush();
+            }
+
+            outputStr.writeUTF("Latest record table:");
+            outputStr.flush();
+
+            BufferedReader br = null;
+            String textLine;
+            try
+            {
+                br = new BufferedReader(new FileReader("Record.txt"));
+            }
+            catch(Exception e)
+            {
+                System.out.println("Cannot open file, program terminated");
+            }
+
+            textLine = br.readLine();
+            while(textLine!=null)
+            {
+                outputStr.writeUTF(textLine);
+                outputStr.flush();
+                textLine = br.readLine();
+            }
+            br.close();
+
+            outputStr.writeUTF("end");
+            outputStr.flush();
+        }
+        catch (IOException e) { e.printStackTrace(); } catch (InterruptedException e) { e.printStackTrace(); }
+
     }
 
 }

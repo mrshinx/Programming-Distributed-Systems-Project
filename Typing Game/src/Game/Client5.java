@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Client2 {
+public class Client5 {
 
     static DataOutputStream outputStr;
     static DataInputStream inputStr;

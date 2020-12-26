@@ -140,6 +140,7 @@ public class Client {
             if(serverMessage.equals("ok"))
             {
                 System.out.println("Logged in successfully");
+                Play(account);
             }
             else
             {
@@ -147,8 +148,45 @@ public class Client {
                 password = "";
             }
         }
-        Interface();
 
+    }
+
+    public static void Play(String account) throws IOException
+    {
+        String input ="", serverMessage="";
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Press y to get ready for matchmaking: ");
+        while(!input.equals("y"))
+        {
+            input = sc.nextLine();
+            if(!input.equals("y")) System.out.println("Invalid input, press y to get ready for matchmaking: ");
+        }
+
+        System.out.println("Waiting for matchmaking...");
+        outputStr.writeUTF(account);
+        outputStr.flush();
+
+        while(!serverMessage.equals("Start"))
+        {
+            serverMessage = inputStr.readUTF();
+            System.out.println(serverMessage);
+        }
+        // Read and print the random text:
+        serverMessage = inputStr.readUTF();
+        System.out.println(serverMessage);
+        // Player types the text:
+        input = sc.nextLine();
+        // Send what the player typed to ServerBehavior
+        outputStr.writeUTF(input);
+        outputStr.flush();
+
+        // Receive message from server to know player performance and result
+        while(!serverMessage.equals("end"))
+        {
+            serverMessage = inputStr.readUTF();
+            if(!serverMessage.equals("end")) System.out.println(serverMessage);
+        }
     }
 
 }
