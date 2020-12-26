@@ -255,9 +255,8 @@ public class ServerBehavior implements Runnable{
     {
         String characters = "QWERTYUIOPASDFGHJKLZXCVBNM";
         String text = "";
-        String block;
         Random rand = new Random();
-        while(text.length()<80)
+        while(text.length()<62)
         {
             int length = rand.nextInt(8);
             char[] word = new char[length];
@@ -276,8 +275,21 @@ public class ServerBehavior implements Runnable{
             }
             text += " ";
         }
-        block = text.substring(0, text.length() -1);
-        return block;
+        int lastlength = 70 - text.length();
+        char[] word = new char[lastlength];
+        for(int i=0; i<lastlength ;i++)
+            {
+
+                word[i]=characters.charAt(rand.nextInt(characters.length()));
+
+            }
+            for(int i=0; i < word.length;i++)
+            {
+                text += word[i];
+
+            }
+        
+       return text;
     }
 
     void Play()
