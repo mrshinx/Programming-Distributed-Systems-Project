@@ -49,16 +49,12 @@ public class MatchManager extends Thread{
 
             ServerBehavior randomPlayer = keys.get(random.nextInt(keys.size())); // Pick random player (serverBehavior) from ready list
             Team1.add(randomPlayer); // Add picked player to Team 1
-            System.out.println("Player Team 1: " + randomPlayer);
             ServerThreadManager.ReadyAccounts.remove(randomPlayer); // Delete picked player from ready list
-            System.out.println("List after picked: " + ServerThreadManager.ReadyAccounts);
             keys.remove(randomPlayer); // Delete picked player from key
 
             randomPlayer = keys.get(random.nextInt(keys.size())); // Pick random player (serverBehavior) from ready list
             Team2.add(randomPlayer); // Add picked player to Team 2
-            System.out.println("Player Team 2: " + randomPlayer);
             ServerThreadManager.ReadyAccounts.remove(randomPlayer); // Delete picked player from ready list
-            System.out.println("List after picked: " + ServerThreadManager.ReadyAccounts);
             keys.remove(randomPlayer); // Delete picked player from key
 
         }

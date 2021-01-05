@@ -265,14 +265,11 @@ public class Match implements Runnable{
 
     public void DetermineRecord(Double time)
     {
-        System.out.println("Base time: "+ time);
         for (int i=0; i<recordData.size();i++)
         {
             if (i==5) break;
-            System.out.println("Time to compare: "+ recordData.get(i).time);
             if (time.toString().equals(recordData.get(i).time.toString()))
             {
-                System.out.println(time+" = "+recordData.get(i).time);
                 for(ServerBehavior player : Team1)
                 {
                     if (player.account.equals(recordData.get(i).account))

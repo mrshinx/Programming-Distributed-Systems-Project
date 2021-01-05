@@ -191,7 +191,6 @@ public class ServerBehavior implements Runnable{
             password = inputStr.readUTF();
             if (password.equals(passwordList.get(index)))
             {
-                System.out.println("Logged in successfully!");
                 ServerThreadManager.OnlineAccounts.put(this, account);
                 System.out.println("Online Players : " + ServerThreadManager.OnlineAccounts);
                 outputStr.writeUTF("ok");
@@ -278,18 +277,18 @@ public class ServerBehavior implements Runnable{
         int lastlength = 70 - text.length();
         char[] word = new char[lastlength];
         for(int i=0; i<lastlength ;i++)
-            {
+        {
 
-                word[i]=characters.charAt(rand.nextInt(characters.length()));
+            word[i]=characters.charAt(rand.nextInt(characters.length()));
 
-            }
-            for(int i=0; i < word.length;i++)
-            {
-                text += word[i];
+        }
+        for(int i=0; i < word.length;i++)
+        {
+            text += word[i];
 
-            }
-        
-       return text;
+        }
+
+        return text;
     }
 
     void Play()
@@ -362,7 +361,6 @@ public class ServerBehavior implements Runnable{
         Integer countdown = 5;
         String playerInput;
         String text = Textgen();
-        System.out.println(text.length());
 
         try{
             outputStr.writeUTF("Game starts after:");
@@ -456,20 +454,19 @@ public class ServerBehavior implements Runnable{
             try
             {
                 br = new BufferedReader(new FileReader("Record.txt"));
+                textLine = br.readLine();
+                while(textLine!=null)
+                {
+                    outputStr.writeUTF(textLine);
+                    outputStr.flush();
+                    textLine = br.readLine();
+                }
+                br.close();
             }
             catch(Exception e)
             {
                 System.out.println("Cannot open file, program terminated");
             }
-
-            textLine = br.readLine();
-            while(textLine!=null)
-            {
-                outputStr.writeUTF(textLine);
-                outputStr.flush();
-                textLine = br.readLine();
-            }
-            br.close();
 
             outputStr.writeUTF("end");
             outputStr.flush();
